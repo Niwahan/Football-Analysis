@@ -1,0 +1,8 @@
+*__pycahce__*
+*.pyc
+/training/football-players-detection-12*
+/training/yolov5xu.pt
+/output/*
+/stubs/*
+/models/
+yolov8x.pt
