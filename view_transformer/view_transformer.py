@@ -46,5 +46,5 @@ class ViewTransformer():
                     
                     if position_transformed is not None:
                         position_transformed = position_transformed.squeeze().tolist()
-                        tracks[object][frame_num][track_id]['position_transformed'] = position_transformed
+                    tracks[object][frame_num][track_id]['position_transformed'] = position_transformed
     

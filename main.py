@@ -5,6 +5,7 @@ from team_assigner import TeamAssigner
 from player_ball_assigner import PlayerBallAssigner
 from camera_movement import CameraMovementEstimator
 from view_transformer import ViewTransformer
+from speed_and_distance_estimator import SpeedAndDistanceEstimator
 
 def main():
     # Read Video
@@ -15,13 +16,12 @@ def main():
     
     tracks = tracker.get_object_tracks(video_frames, read_from_stub=True, stub_path='stubs/track_stubs.pkl')
     
-    
     # Get object positions
     tracker.add_position_to_tracks(tracks)
     
     # Camera Movement Estimator
     camera_movement_estimator = CameraMovementEstimator(video_frames[0])
-    camera_movement_per_frame = camera_movement_estimator.get_camera_movement(video_frames, read_from_stub=True, stub_path='stubs/camera_movement_stub.pk1')
+    camera_movement_per_frame = camera_movement_estimator.get_camera_movement(video_frames, read_from_stub=True, stub_path='stubs/camera_movement_stub.pkl')
     
     camera_movement_estimator.add_adjust_positions_to_tracks(tracks, camera_movement_per_frame)
     
@@ -31,6 +31,10 @@ def main():
     
     # Interpolate Ball Position
     tracks["ball"] = tracker.interpolate_ball_positions(tracks["ball"])
+    
+    # Speed and Distance Estimator
+    speed_and_distance_estimator = SpeedAndDistanceEstimator()
+    speed_and_distance_estimator.add_speed_and_distance_to_tracks(tracks)
     
     # Assign Player Teams
     team_assigner = TeamAssigner()
@@ -59,12 +63,16 @@ def main():
         else:
             team_ball_control.append(team_ball_control[-1])
     team_ball_control = np.array(team_ball_control)
+    
     # Draw Output
     # Draw Object Tracks
     output_video_frames = tracker.draw_annotations(video_frames, tracks, team_ball_control)
 
     # Draw Camera Movement
     output_video_frames = camera_movement_estimator.draw_camera_movement(output_video_frames, camera_movement_per_frame)
+    
+    # Draw Speed and Distance
+    speed_and_distance_estimator.draw_speed_and_distance(output_video_frames, tracks)
     
     # Save Video
     save_video(output_video_frames, 'output/output_video.avi')
